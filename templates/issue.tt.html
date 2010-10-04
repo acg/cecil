@@ -1,0 +1,26 @@
+[% INCLUDE begin.tt.html %]
+
+<div class="content">
+  <div class="issue">
+
+    <dl class="headers">
+
+[% FOREACH key IN issue_fields -%]
+      <dt>[% key | html %]:</dt>
+  [% IF issue.$key != "" -%]
+      <dd>[% issue.$key | html -%]</dd>
+  [% ELSE -%]
+      <dd>&nbsp;</dd>
+  [% END -%]
+[% END -%]
+
+    </dl>
+
+    <div class="description">
+      <pre>[% issue.Description | html %]</pre>
+    </div>
+
+  </div> <!-- .issue -->
+</div> <!-- .content -->
+
+[% INCLUDE end.tt.html %]

@@ -1,0 +1,28 @@
+[% INCLUDE begin.tt.html %]
+
+<div class="content">
+
+<table class="tablesorter">
+<thead>
+[% FOREACH field IN summary_fields %]
+  <th>[% field | html %]</th>
+[% END %]
+</thead>
+<tbody>
+[% FOREACH issue IN issues %]
+  <tr>
+  [%- FOREACH field IN summary_fields %]
+    [%- IF issue.$field.type == 'String' %]
+    <td>[% issue.$field.text | html %]</td>
+    [%- ELSIF issue.$field.type == 'Link' %]
+    <td><a href="[% issue.$field.url %]">[% issue.$field.text | html %]</a></td>
+    [%- END %]
+  [%- END %]
+  </tr>
+[% END %]
+</tbody>
+</thead>
+
+</div>
+
+[% INCLUDE end.tt.html %]

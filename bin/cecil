@@ -1,0 +1,184 @@
+#!/usr/bin/perl
+
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+use Template;  # Template::Toolkit
+use open ':encoding(utf8)';
+use open ':std';
+use warnings;
+use strict;
+
+my %config = (
+  prefix => "$FindBin::Bin/..",
+  summary_fields => [ qw(Id Status Owner Summary) ],
+  issue_fields => [ qw(Id Summary Status AssignedTo CreatedBy Inserted Updated) ],
+);
+
+my $issues_dir = shift or die;
+#my $id = shift or die;
+#my $data = issue_page_data( $issues_dir, $id );
+my $data = summary_page_data( $issues_dir );
+
+print render_html( \%config, $data );
+
+# produce a summary page
+# produce an issue page (pull in comments as well)
+# ? produce a list of dependencies
+
+exit 0;
+
+
+sub render_html
+{
+  my $config = shift;
+  my $data = shift;
+
+  my @tt_inc = (
+    "$config->{prefix}/templates",
+    "$config->{prefix}/templates/include"
+  );
+
+  my $tt = Template->new( {
+    ABSOLUTE => 1,
+    INCLUDE_PATH => join(":", @tt_inc),
+  } ) or die "$Template::ERROR".$/;
+
+  my $tt_vars = {
+    %$config,
+    %$data,
+  };
+
+  my $html = "";
+
+  $tt->process( "$tt_inc[0]/$data->{page}->{template}", $tt_vars, \$html ) or
+    die $tt->error.$/;
+
+  return $html;
+}
+
+
+sub summary_page_data
+{
+  my $issues_dir = shift;
+  my @issues = map load_issue( $_, headers => 1 )
+    => glob( "$issues_dir/i_*.cil" );
+
+  for my $issue (@issues)
+  {
+    $issue->{Owner} = $issue->{AssignedTo};
+    $issue->{Owner} ||= "Nobody";
+    $issue->{Owner} =~ s/\s*<\S+\@\S+>\s*$//;
+
+    my $Id = $issue->{Id};
+
+    while (my ($key, $value) = each %$issue)
+    {
+      if ($key eq 'Id' || $key eq 'Summary')
+      {
+        $issue->{$key} = {
+          type => 'Link',
+          url => "i_${Id}.html",
+          text => $value,
+        };
+      }
+      else
+      {
+        $issue->{$key} = {
+          type => 'String',
+          text => $value,
+          value => $value,
+        };
+      }
+    }
+  }
+
+  return {
+    page => {
+      name => 'summary',
+      template => 'summary.tt.html',
+      title => 'Summary of Issues',
+      css => [ qw( styles/reset.css styles/main.css styles/tablesorter.css ) ],
+      js => [
+        'js/jquery.min.js',
+        'js/jquery.tablesorter.min.js',
+        'js/jquery.main.js',
+      ],
+    },
+    issues => \@issues,
+  };
+}
+
+
+sub issue_page_data
+{
+  my $issues_dir = shift;
+  my $id = shift;
+  my $issue = load_issue( "$issues_dir/i_${id}.cil" );
+
+  return {
+    page => {
+      name => 'issue',
+      template => 'issue.tt.html',
+      title => "Issue $issue->{Id}",
+      css => [ qw( styles/reset.css styles/main.css styles/issue.css ) ],
+      js => [ ],
+    },
+    issue => $issue,
+  };
+}
+
+
+sub load_issue
+{
+  my $file = shift;
+  my %opts = @_;
+
+  open my $fh, '<', $file or
+    die "open error for $file: $!";
+
+  my %fields = (
+    Id => ($file =~ m{i_([A-Fa-f0-9]+)\.cil$})[0],
+  );
+
+  my $body;
+  my $in_headers = 1;
+
+  while (<$fh>)
+  {
+    chomp;
+
+    if ($in_headers)
+    {
+      if (/^(\w+):\s*(.*)$/) {
+        my ($key, $value) = ($1, $2);
+
+        if (exists $fields{$key}) {
+          $fields{$key} = [ $fields{$key} ] if not ref $fields{$key};
+          push @{ $fields{$key} }, $value;
+        }
+        else {
+          $fields{$key} = $value;
+        }
+      }
+      else {
+        $in_headers = 0;
+      }
+    }
+    else
+    {
+      last if $opts{headers} && $in_headers;
+      $body = "" unless defined $body;
+      $body .= $_."\n";
+    }
+  }
+
+  $fields{Description} = $body if defined $body;
+
+  close $fh or
+    die "close error for $file: $!";
+
+  ### TODO read comments
+
+  return \%fields;
+}
+
