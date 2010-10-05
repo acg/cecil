@@ -26,5 +26,10 @@
 
 .section-issue .issue .description {
   padding: 20px;
+  overflow: auto;
+}
+
+.section-issue .issue .description p {
+  padding-bottom: 10px;
 }
 
