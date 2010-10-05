@@ -15,15 +15,20 @@ my %config = (
 );
 
 my $issues_dir = shift or die;
-#my $id = shift or die;
-#my $data = issue_page_data( $issues_dir, $id );
-my $data = summary_page_data( $issues_dir );
+my $uri = shift or die;
+my $data;
+
+if ($uri =~ m{^/summary\.html}) {
+  $data = summary_page_data( $issues_dir );
+}
+elsif ($uri =~ m{^/i_([A-Fa-f0-9]+)\.html$}) {
+  $data = issue_page_data( $issues_dir, $1 );
+}
+else {
+  die "unrecognized uri: $uri";
+}
 
 print render_html( \%config, $data );
-
-# produce a summary page
-# produce an issue page (pull in comments as well)
-# ? produce a list of dependencies
 
 exit 0;
 
