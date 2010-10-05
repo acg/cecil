@@ -96,9 +96,7 @@ sub summary_page_data
 
     $issue->{Worked} ||= 0.0;
     $issue->{Estimated} ||= 0.0;
-    $issue->{Progress} = "$issue->{Worked} / $issue->{Estimated}" if
-      $issue->{Worked} > 0 || $issue->{Estimated} > 0;
-
+    $issue->{Progress} = "$issue->{Worked} / $issue->{Estimated}";
 
     my $Id = $issue->{Id};
 
@@ -129,6 +127,7 @@ sub summary_page_data
         value => "",
       };
     }
+
   }
 
 
