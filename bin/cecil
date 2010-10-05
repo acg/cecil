@@ -3,14 +3,16 @@
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 use Template;  # Template::Toolkit
+use HTTP::Date qw/ str2time /;
 use open ':encoding(utf8)';
 use open ':std';
 use warnings;
 use strict;
 
-my %config = (
+my %config =
+(
   prefix => "$FindBin::Bin/..",
-  summary_fields => [ qw(Id Status Owner Summary) ],
+  summary_fields => [ qw(Id Status Owner Progress DueDate Summary) ],
   issue_fields => [ qw(Id Summary Status AssignedTo CreatedBy Inserted Updated) ],
 );
 
@@ -19,10 +21,10 @@ my $uri = shift or die;
 my $data;
 
 if ($uri =~ m{^/summary\.html}) {
-  $data = summary_page_data( $issues_dir );
+  $data = summary_page_data( \%config, $issues_dir );
 }
 elsif ($uri =~ m{^/i_([A-Fa-f0-9]+)\.html$}) {
-  $data = issue_page_data( $issues_dir, $1 );
+  $data = issue_page_data( \%config, $issues_dir, $1 );
 }
 else {
   die "unrecognized uri: $uri";
@@ -64,15 +66,39 @@ sub render_html
 
 sub summary_page_data
 {
+  my $config = shift;
   my $issues_dir = shift;
   my @issues = map load_issue( $_, headers => 1 )
     => glob( "$issues_dir/i_*.cil" );
+
 
   for my $issue (@issues)
   {
     $issue->{Owner} = $issue->{AssignedTo};
     $issue->{Owner} ||= "Nobody";
     $issue->{Owner} =~ s/\s*<\S+\@\S+>\s*$//;
+
+    if (exists $issue->{Worked})
+    {
+      my $sum = 0;
+
+      for (@{ $issue->{Worked} }) {
+        my ($email, $time0, $time1) = split( /\s+/, $_, 3 );
+        $time0 = parse_timezstamp($time0);
+        $time1 = $time1 ? parse_timezstamp($time1) : time;
+        $sum += ($time1 - $time0);
+      }
+
+      $sum /= 3600;
+      $sum = sprintf "%.1f", $sum;
+      $issue->{Worked} = $sum;
+    }
+
+    $issue->{Worked} ||= 0.0;
+    $issue->{Estimated} ||= 0.0;
+    $issue->{Progress} = "$issue->{Worked} / $issue->{Estimated}" if
+      $issue->{Worked} > 0 || $issue->{Estimated} > 0;
+
 
     my $Id = $issue->{Id};
 
@@ -95,7 +121,16 @@ sub summary_page_data
         };
       }
     }
+
+    for my $key (@{ $config->{summary_fields} }) {
+      $issue->{$key} ||= {
+        type => 'String',
+        text => "",
+        value => "",
+      };
+    }
   }
+
 
   return {
     page => {
@@ -116,6 +151,7 @@ sub summary_page_data
 
 sub issue_page_data
 {
+  my $config = shift;
   my $issues_dir = shift;
   my $id = shift;
   my $issue = load_issue( "$issues_dir/i_${id}.cil" );
@@ -124,7 +160,7 @@ sub issue_page_data
     page => {
       name => 'issue',
       template => 'issue.tt.html',
-      title => "Issue $issue->{Id}",
+      title => "Issue #$issue->{Id}: $issue->{Summary}",
       css => [ qw( styles/reset.css styles/main.css styles/issue.css ) ],
       js => [ ],
     },
@@ -147,6 +183,7 @@ sub load_issue
 
   my $body;
   my $in_headers = 1;
+  my %array_fields = map {$_,1} qw/ Comment Worked /;
 
   while (<$fh>)
   {
@@ -157,11 +194,9 @@ sub load_issue
       if (/^(\w+):\s*(.*)$/) {
         my ($key, $value) = ($1, $2);
 
-        if (exists $fields{$key}) {
-          $fields{$key} = [ $fields{$key} ] if not ref $fields{$key};
+        if ($array_fields{$key}) {
           push @{ $fields{$key} }, $value;
-        }
-        else {
+        } else {
           $fields{$key} = $value;
         }
       }
@@ -185,5 +220,13 @@ sub load_issue
   ### TODO read comments
 
   return \%fields;
+}
+
+
+sub parse_timezstamp
+{
+  my $timestamp = shift;
+  my $zone = ($timestamp =~ s/Z(.+)$// and $1 or "gmtime");
+  return str2time( $timestamp, $zone );
 }
 
