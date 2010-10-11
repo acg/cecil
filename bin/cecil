@@ -4,6 +4,7 @@ use FindBin;
 use lib "$FindBin::Bin/../lib";
 use Template;  # Template::Toolkit
 use HTTP::Date qw/ str2time /;
+use POSIX qw/ strftime /;
 use open ':encoding(utf8)';
 use open ':std';
 use warnings;
@@ -12,7 +13,7 @@ use strict;
 my %config =
 (
   prefix => "$FindBin::Bin/..",
-  summary_fields => [ qw(Id Status Owner Progress DueDate Summary) ],
+  summary_fields => [ qw(Id Status Owner Progress DueDate Updated Summary) ],
   issue_fields => [ qw(Id Summary Status AssignedTo CreatedBy Inserted Updated) ],
 );
 
@@ -97,6 +98,8 @@ sub summary_page_data
     $issue->{Worked} ||= 0.0;
     $issue->{Estimated} ||= 0.0;
     $issue->{Progress} = "$issue->{Worked} / $issue->{Estimated}";
+    $issue->{Updated} = strftime( '%D %R' =>
+      localtime parse_timezstamp( $issue->{Updated} ) );
 
     my $Id = $issue->{Id};
 
