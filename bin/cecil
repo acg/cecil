@@ -101,6 +101,11 @@ sub summary_page_data
     $issue->{Updated} = strftime( '%D %R' =>
       localtime parse_timezstamp( $issue->{Updated} ) );
 
+    if (my $date = $issue->{DueDate}) {
+      $issue->{DueDate} = strftime( '%D %R' =>
+        localtime parse_timezstamp( $date ) );
+    }
+
     my $Id = $issue->{Id};
 
     while (my ($key, $value) = each %$issue)
@@ -228,7 +233,7 @@ sub load_issue
 sub parse_timezstamp
 {
   my $timestamp = shift;
-  my $zone = ($timestamp =~ s/Z(.+)$// and $1 or "gmtime");
+  my $zone = ($timestamp =~ s/Z(.+)$// and $1 or undef);
   return str2time( $timestamp, $zone );
 }
 
