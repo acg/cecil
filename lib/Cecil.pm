@@ -1,6 +1,7 @@
 package Cecil;
 
 use Template;  # Template::Toolkit
+use URI;
 use HTTP::Response;
 use HTTP::Date qw/ str2time /;
 use POSIX qw/ strftime /;
@@ -31,15 +32,17 @@ sub handle
 {
   my $self = shift;
   my $request = shift;
-  my $uri = $request->uri;
+  my $uri = URI->new($request->uri);
   my $config = $self->{config};
   my $issues_dir = $config->{issues_dir};
   my $data;
 
-  if ($uri =~ m{^/summary\.html}) {
+  my $path = $uri->path;
+
+  if ($path eq '/' || $path eq '/summary.html') {
     $data = summary_page_data( $config, $issues_dir );
   }
-  elsif ($uri =~ m{^/i_([A-Fa-f0-9]+)\.html$}) {
+  elsif ($path =~ m{^/i_([A-Fa-f0-9]+)\.html$}) {
     $data = issue_page_data( $config, $issues_dir, $1 );
   }
   else {
@@ -47,7 +50,7 @@ sub handle
   }
 
   my $html = render_html( $config, $data );
-  my $response = HTTP::Response->new( 200 );
+  my $response = HTTP::Response->new( 200, 'OK' );
   $response->header( 'Content-Type', 'text/html' );
   $response->content( $html );
   return $response;

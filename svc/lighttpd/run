@@ -1,0 +1,3 @@
+#!/bin/sh
+cd ../..
+exec lighttpd -D -f etc/lighttpd.conf
