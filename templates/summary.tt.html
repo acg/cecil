@@ -2,11 +2,34 @@
 
 <div class="content">
 
+<form action="" method="get">
+
 <table class="tablesorter">
 <thead>
 [% FOREACH field IN summary_fields %]
   <th>[% field | html %]</th>
 [% END %]
+</thead>
+<thead>
+  <tr>
+  [% FOREACH field IN summary_fields %]
+    <td>
+      [%- IF filters.$field %]
+      <select class="filter" name="filters.[% field | html %]">
+        [%- FOREACH option IN filters.$field %]
+          [%- IF option.active %]
+        <option value="[% option.value | html %]" selected="true">
+          [%- ELSE %]
+        <option value="[% option.value | html %]">
+          [%- END %]
+        [% option.text | html %]
+        </option>
+        [%- END %]
+      </select>
+      [%- END %]
+    </td>
+  [% END %]
+  </tr>
 </thead>
 <tbody>
 [% FOREACH issue IN issues %]
@@ -22,6 +45,8 @@
 [% END %]
 </tbody>
 </thead>
+
+</form>
 
 </div>
 
