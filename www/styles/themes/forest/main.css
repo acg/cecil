@@ -36,5 +36,65 @@ table.tablesorter tbody td {
 table.tablesorter thead tr .headerSortDown, table.tablesorter thead tr .headerSortUp {
   color: #eee;
   background-color: #7a7;
+  border-color: #eee;
+}
+
+table.tablesorter tbody a,
+table.tablesorter tbody a:visited {
+  text-decoration: none;
+  color: #133;
+}
+
+table.tablesorter tbody a:hover {
+  text-decoration: underline;
+}
+
+table.tablesorter .field-Id {
+  font-family: monospace;
+  text-align: center;
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
+
+/* Individual issue page. */
+
+.section-issue .issue {
+  background-color: #ddd;
+  border: 1px solid #000;
+}
+
+.section-issue .issue dl.headers dt {
+  float: left;
+  width: 120px;
+  margin-right: 10px;
+  padding: 4px 8px 2px 8px;
+  font-weight: bold;
+  background-color: #0f390f;
+  color: #ccc;
+}
+
+.section-issue .issue dl.headers dd {
+  background-color: #cdc;
+  padding: 4px 8px 2px 8px;
+  border-bottom: 1px solid #666;
+}
+
+.section-issue .issue dl.headers {
+  border-bottom: 1px solid #aaa;
+}
+
+.section-issue .issue dl.headers dd.field-Id {
+  font-family: monospace;
+}
+
+.section-issue .issue .description {
+  padding: 20px;
+  overflow: auto;
+  color: #222;
+}
+
+.section-issue .issue .description p {
+  padding-bottom: 10px;
 }
 

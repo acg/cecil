@@ -146,7 +146,8 @@ sub summary_page_data
       template => 'summary.tt.html',
       title => 'Summary of Issues',
       css => [
-        qw( styles/reset.css styles/tablesorter.css ),
+        'styles/reset.css',
+        'styles/tablesorter.css',
         "styles/themes/$config->{theme}/main.css"
       ],
       js => [
@@ -175,7 +176,6 @@ sub issue_page_data
       css => [
         'styles/reset.css',
         "styles/themes/$config->{theme}/main.css",
-        "styles/themes/$config->{theme}/issue.css",
       ],
       js => [ ],
     },

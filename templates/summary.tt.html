@@ -13,9 +13,9 @@
   <tr>
   [%- FOREACH field IN summary_fields %]
     [%- IF issue.$field.type == 'String' %]
-    <td>[% issue.$field.text | html %]</td>
+    <td class="field-[% field %]">[% issue.$field.text | html %]</td>
     [%- ELSIF issue.$field.type == 'Link' %]
-    <td><a href="[% issue.$field.url %]">[% issue.$field.text | html %]</a></td>
+    <td class="field-[% field %]"><a href="[% issue.$field.url %]">[% issue.$field.text | html %]</a></td>
     [%- END %]
   [%- END %]
   </tr>

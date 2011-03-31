@@ -6,9 +6,9 @@
     <dl class="headers">
 
 [% FOREACH key IN issue_fields -%]
-      <dt>[% key | html %]:</dt>
+      <dt class="field-[% key %]">[% key | html %]:</dt>
   [% IF issue.$key != "" -%]
-      <dd>[% issue.$key | html -%]</dd>
+      <dd class="field-[% key %]">[% issue.$key | html -%]</dd>
   [% ELSE -%]
       <dd>&nbsp;</dd>
   [% END -%]
