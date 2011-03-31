@@ -42,7 +42,7 @@ table.tablesorter thead tr .headerSortDown, table.tablesorter thead tr .headerSo
 table.tablesorter tbody a,
 table.tablesorter tbody a:visited {
   text-decoration: none;
-  color: #133;
+  color: #024;
 }
 
 table.tablesorter tbody a:hover {
@@ -54,6 +54,10 @@ table.tablesorter .field-Id {
   text-align: center;
   padding-left: 8px;
   padding-right: 8px;
+}
+
+table.tablesorter .field-Updated {
+  text-align: center;
 }
 
 
