@@ -1,0 +1,40 @@
+body {
+  font-family: arial;
+  font-size: 12pt;
+  color: #3d3d3d;
+  background-color: #464;
+}
+
+.content {
+  margin: 30px 60px;
+}
+
+table.tablesorter thead tr .header {
+  background-image: url(../../../images/themes/forest/bg.gif);
+}
+
+table.tablesorter thead tr .headerSortUp {
+  background-image: url(../../../images/themes/forest/asc.gif);
+}
+
+table.tablesorter thead tr .headerSortDown {
+  background-image: url(../../../images/themes/forest/desc.gif);
+}
+
+table.tablesorter thead tr th,
+table.tablesorter tfoot tr th {
+  background-color: #0f390f;
+  color: #ccc;
+}
+
+table.tablesorter tbody td {
+  background-color: #cdc;
+  color: #444;
+  border: 1px solid #aaa;
+}
+
+table.tablesorter thead tr .headerSortDown, table.tablesorter thead tr .headerSortUp {
+  color: #eee;
+  background-color: #7a7;
+}
+

@@ -15,6 +15,7 @@ my %config =
   prefix => "$FindBin::Bin/..",
   summary_fields => [ qw(Id Status Owner Progress DueDate Updated Summary) ],
   issue_fields => [ qw(Id Summary Status AssignedTo CreatedBy Inserted Updated) ],
+  theme => 'forest',
 );
 
 my $issues_dir = shift or die;
@@ -144,7 +145,10 @@ sub summary_page_data
       name => 'summary',
       template => 'summary.tt.html',
       title => 'Summary of Issues',
-      css => [ qw( styles/reset.css styles/main.css styles/tablesorter.css ) ],
+      css => [
+        qw( styles/reset.css styles/tablesorter.css ),
+        "styles/themes/$config->{theme}/main.css"
+      ],
       js => [
         'js/jquery.min.js',
         'js/jquery.tablesorter.min.js',
@@ -168,7 +172,11 @@ sub issue_page_data
       name => 'issue',
       template => 'issue.tt.html',
       title => "Issue #$issue->{Id}: $issue->{Summary}",
-      css => [ qw( styles/reset.css styles/main.css styles/issue.css ) ],
+      css => [
+        'styles/reset.css',
+        "styles/themes/$config->{theme}/main.css",
+        "styles/themes/$config->{theme}/issue.css",
+      ],
       js => [ ],
     },
     issue => $issue,

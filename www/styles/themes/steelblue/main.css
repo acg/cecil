@@ -1,0 +1,23 @@
+body {
+  font-family: arial;
+  font-size: 12pt;
+  color: #3d3d3d;
+  background-color: #888;
+}
+
+.content {
+  margin: 30px 60px;
+}
+
+table.tablesorter thead tr .header {
+  background-image: url(../../../images/themes/steelblue/bg.gif);
+}
+
+table.tablesorter thead tr .headerSortUp {
+  background-image: url(../../../images/themes/steelblue/asc.gif);
+}
+
+table.tablesorter thead tr .headerSortDown {
+  background-image: url(../../../images/themes/steelblue/desc.gif);
+}
+
