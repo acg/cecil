@@ -147,6 +147,7 @@ sub summary_page_data
   my @issue_deps = map { [ $issue_indices{$_->{Parent}||''} || () ] } @issues;
   my @issue_tsort = tsort( @issue_deps );
 
+  die "Cyclic parent dependencies" if @issues != @issue_tsort;
   @issues = map $issues[$_] => @issue_tsort;
   %issue_indices = do { my $i=0; map { ("$_->{Id}", $i++) } @issues };
 
