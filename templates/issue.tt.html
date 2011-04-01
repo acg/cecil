@@ -8,7 +8,11 @@
 [% FOREACH key IN issue_fields -%]
       <dt class="field-[% key %]">[% key | html %]:</dt>
   [% IF issue.$key != "" -%]
+    [% IF key == "Id" or key == "Parent" -%]
+      <dd class="field-[% key %]"><a href="../i_[% issue.$key | html %].html">[% issue.$key | html -%]</a></dd>
+    [% ELSE -%]
       <dd class="field-[% key %]">[% issue.$key | html -%]</dd>
+    [% END -%]
   [% ELSE -%]
       <dd>&nbsp;</dd>
   [% END -%]

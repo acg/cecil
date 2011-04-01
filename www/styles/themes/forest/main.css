@@ -56,7 +56,8 @@ table.tablesorter tbody a:hover {
   text-decoration: underline;
 }
 
-table.tablesorter .field-Id {
+table.tablesorter .field-Id,
+table.tablesorter .field-Parent {
   font-family: monospace;
   text-align: center;
   padding-left: 8px;
@@ -138,7 +139,18 @@ tr.Status-Aborted .percentage .mask {
   border-bottom: 1px solid #aaa;
 }
 
-.section-issue .issue dl.headers dd.field-Id {
+.section-issue .issue a,
+.section-issue .issue a:visited {
+  text-decoration: none;
+  color: #024;
+}
+
+.section-issue .issue a:hover {
+  text-decoration: underline;
+}
+
+.section-issue .issue dl.headers dd.field-Id,
+.section-issue .issue dl.headers dd.field-Parent {
   font-family: monospace;
 }
 

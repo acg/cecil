@@ -15,8 +15,8 @@ use strict;
 
 our %DEFAULT_CONFIG =
 (
-  summary_fields => [ qw(Id Status Owner Progress DueDate Updated Summary) ],
-  issue_fields => [ qw(Id Summary Status AssignedTo CreatedBy Inserted Updated) ],
+  summary_fields => [ qw(Id Parent Status Owner Progress DueDate Updated Summary) ],
+  issue_fields => [ qw(Id Parent Summary Status AssignedTo CreatedBy Inserted Updated) ],
   theme => 'steelblue',
 );
 
@@ -211,7 +211,7 @@ sub summary_page_data
 
     while (my ($key, $value) = each %$issue)
     {
-      if ($key eq 'Id' || $key eq 'Summary')
+      if ($key eq 'Id' || $key eq 'Parent' || $key eq 'Summary')
       {
         $issue_ui->{$key} = {
           type => 'Link',
