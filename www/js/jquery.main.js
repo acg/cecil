@@ -44,15 +44,12 @@ $.fn.percentageBar = function() {
       }
     }
 
-    var bar = $('<div class="percentage"><div class="text">'+percent+' %</div><div class="pos">&nbsp;</div></div>');
+    var bar = $('<div class="percentage"><div class="text">'+percent+' %</div><div class="pos">&nbsp;</div><div class="mask">&nbsp;</div></div>');
     var pos = $('.pos', bar);
     var issue = $(elem).parent('tr');
 
     pos.css({ width: percent+'%' });
-
-    // HACK overlay a gray alpha mask instead
-    if (!issue.hasClass('Status-Finished') && !issue.hasClass('Status-Aborted'))
-      pos.css({ 'background-color': '#'+color });
+    pos.css({ 'background-color': '#'+color });
 
     if (percent > 100) $(bar).addClass("over");
     if (y == 0) $(bar).addClass("unknown");

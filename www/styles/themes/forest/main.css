@@ -77,6 +77,16 @@ table.tablesorter .field-Updated {
   overflow: hidden;
 }
 
+.percentage .mask {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+  background: transparent url(../../../images/themes/forest/percentage-clear.png) repeat 0 0;
+}
+
 .percentage .text {
   position: absolute;
   left: 4px;
@@ -95,13 +105,9 @@ table.tablesorter .field-Updated {
   background-color: #c93;
 }
 
-.percentage.unknown .text {
-  /* display: none; */
-}
-
-tr.Status-Finished .percentage .pos,
-tr.Status-Aborted .percentage .pos {
-  background-color: #888;
+tr.Status-Finished .percentage .mask,
+tr.Status-Aborted .percentage .mask {
+  background-image: url(../../../images/themes/forest/percentage-shaded.png);
 }
 
 
