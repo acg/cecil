@@ -99,6 +99,10 @@ table.tablesorter .field-Updated {
   /* display: none; */
 }
 
+tr.Status-Finished .percentage .pos {
+  background-color: #888;
+}
+
 
 /* Individual issue page. */
 

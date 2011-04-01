@@ -37,7 +37,7 @@
 </thead>
 <tbody>
 [% FOREACH issue IN issues %]
-  <tr>
+  <tr class="Status-[% issue.Status.text | html %]">
   [%- FOREACH field IN summary_fields %]
     [%- IF issue.$field.type == 'String' %]
     <td class="field-[% field %]">[% issue.$field.text | html %]</td>
