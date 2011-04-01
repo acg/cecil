@@ -128,6 +128,12 @@ sub summary_page_data
   }    
 
 
+  ### Load the timesheet files.
+
+  my @timesheet_files = glob( "$issues_dir/t_*.cil" );
+  my @timelogs = map @$_ => map load_timesheet( $_ ) => @timesheet_files;
+
+
   ### Load issues and build the list of issues to show in the ui.
 
   my @issue_files = glob( "$issues_dir/i_*.cil" );
@@ -143,23 +149,12 @@ sub summary_page_data
     $issue->{Owner} ||= "Nobody";
     $issue->{Owner} =~ s/\s*<\S+\@\S+>\s*$//;
 
-    if (exists $issue->{Worked})
-    {
-      my $sum = 0;
+    my $worked = 0;
 
-      for (@{ $issue->{Worked} }) {
-        my ($email, $time0, $time1) = split( /\s+/, $_, 3 );
-        $time0 = parse_timezstamp($time0);
-        $time1 = $time1 ? parse_timezstamp($time1) : time;
-        $sum += ($time1 - $time0);
-      }
+    $worked += ($_->{time1} - $_->{time0}) for
+      grep $_->{issue} eq $issue->{Id} => @timelogs;
 
-      $sum /= 3600;
-      $sum = sprintf "%.1f", $sum;
-      $issue->{Worked} = $sum;
-    }
-
-    $issue->{Worked} ||= 0.0;
+    $issue->{Worked} = sprintf "%.1f" => ($worked/3600);
     $issue->{Estimated} ||= 0.0;
     $issue->{Progress} = "$issue->{Worked} / $issue->{Estimated}";
     $issue->{Updated} = strftime( '%D %R' =>
@@ -169,7 +164,6 @@ sub summary_page_data
       $issue->{DueDate} = strftime( '%D %R' =>
         localtime parse_timezstamp( $date ) );
     }
-
 
     ### Apply any filters. See if this issue should be skipped.
 
@@ -181,7 +175,7 @@ sub summary_page_data
       my $filter_value = $filter->{value} or next;
       $skip_issue ||= !$filter->{matches}($filter_value, $value);
     }
-    
+
 
     ### Build typed data fields for presentation layer.
 
@@ -350,13 +344,38 @@ sub load_issue
 }
 
 
+sub load_timesheet
+{
+  my $file = shift;
+
+  open my $fh, '<', $file or
+    die "open error for $file: $!";
+
+  my @cols = qw( issue status time0 time1 comment );
+  my @records;
+
+  while (<$fh>)
+  {
+      chomp;
+      my @fields = split /\t/, $_, 0+@cols;
+      my %record = map { $cols[$_] => $fields[$_] } (0 .. @cols-1);
+      $record{$_} = $record{$_} ? parse_timezstamp( $record{$_} ) : +time for qw/ time0 time1 /;
+      push @records, \%record;
+  }
+
+  close $fh or
+    die "close error for $file: $!";
+
+  return \@records;
+}
+
+
 sub parse_timezstamp
 {
   my $timestamp = shift;
-  my $zone = ($timestamp =~ s/Z(.+)$// and $1 or undef);
+  my $zone = ($timestamp =~ s/\s*Z?([+-]?\d\d\d\d)$// and $1 or undef);
   return str2time( $timestamp, $zone );
 }
-
 
 1;
 
