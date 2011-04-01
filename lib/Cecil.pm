@@ -59,6 +59,9 @@ sub handle
 }
 
 
+### FIXME There methods beyond this point, just free functions. Refactor.
+
+
 sub render_html
 {
   my $config = shift;
@@ -94,10 +97,43 @@ sub summary_page_data
   my $issues_dir = shift;
   my $param = shift || {};
 
+
+  ### Set up the per-field filters.
+
+  my %filter_configs =
+  (
+    Status => {
+      type => 'select',
+      matches => sub { $_[1] eq $_[0] },
+      options => [ { value => '', text => '-' } ],
+    },
+    Owner => {
+      type => 'select',
+      matches => sub { $_[1] eq $_[0] },
+      options => [ { value => '', text => '-' } ],
+    },
+    Summary => {
+      type => 'text',
+      matches => sub { $_[1] =~ /\Q$_[0]\E/ },
+      size => '40',
+    },
+  );
+
+  my %filters;
+ 
+  while (my ($field, $filter_config) = each %filter_configs)
+  {
+    my $filter = $filters{$field} = { %$filter_config };
+    $filter->{value} = $param->{"filters.value.$field"}||'';
+  }    
+
+
+  ### Load issues and build the list of issues to show in the ui.
+
   my @issue_files = glob( "$issues_dir/i_*.cil" );
   my @issues = map load_issue( $_, headers => 1 ) => @issue_files;
   my @issues_ui;
-  my %filters;
+
 
   for my $issue (@issues)
   {
@@ -139,10 +175,11 @@ sub summary_page_data
 
     my $skip_issue = 0;
 
-    while (my ($key, $value) = each %$issue) {
-      if (my $filter_value = $param->{"filters.$key"}) {
-        $skip_issue ||= ($filter_value ne $value);
-      }
+    while (my ($key, $value) = each %$issue)
+    {
+      my $filter = $filters{$key} or next;
+      my $filter_value = $filter->{value} or next;
+      $skip_issue ||= !$filter->{matches}($filter_value, $value);
     }
     
 
@@ -169,13 +206,18 @@ sub summary_page_data
         };
       }
 
-      if ($key eq 'Status' || $key eq 'Owner')
+      ### Accumulate dropdown options for the select filters.
+
+      if (my $filter = $filters{$key})
       {
-        my $options = $filters{$key} ||= [ { value=>'', text=>'-' } ];
-        my $option = { value=>$value, text=>$value };
-        my $filter_value = $param->{"filters.$key"};
-        $option->{active} = $value eq ($filter_value||'');
-        push @$options, $option;
+        if ($filter->{type} eq 'select')
+        {
+          push @{$filter->{options}}, {
+            value => $value,
+            text => $value,
+            active => $filter->{matches}( $filter->{value}, $value ),
+          };
+        }
       }
     }
 
@@ -196,13 +238,16 @@ sub summary_page_data
 
   ### Sort the filter dropdown values, remove duplicates.
 
-  while (my ($name, $options) = each %filters)
+  for my $filter (values %filters)
   {
-    my %seen;
+    if ($filter->{type} eq 'select')
+    {
+      my %seen;
 
-    @$options =
-      sort { $a->{value} cmp $b->{value} }
-        grep !$seen{$_->{value}}++ => @$options;
+      @{ $filter->{options} } =
+        sort { $a->{value} cmp $b->{value} }
+          grep !$seen{$_->{value}}++ => @{ $filter->{options} };
+    }
   }
 
 

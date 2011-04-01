@@ -15,17 +15,21 @@
   [% FOREACH field IN summary_fields %]
     <td>
       [%- IF filters.$field %]
-      <select class="filter" name="filters.[% field | html %]">
-        [%- FOREACH option IN filters.$field %]
-          [%- IF option.active %]
+        [%- IF filters.$field.type == 'select' %]
+      <select class="filter" name="filters.value.[% field | html %]">
+          [%- FOREACH option IN filters.$field.options %]
+            [%- IF option.active %]
         <option value="[% option.value | html %]" selected="true">
-          [%- ELSE %]
+            [%- ELSE %]
         <option value="[% option.value | html %]">
-          [%- END %]
-        [% option.text | html %]
+            [%- END %]
+          [% option.text | html %]
         </option>
-        [%- END %]
+          [%- END %]
       </select>
+        [%- ELSIF filters.$field.type == 'text' %]
+      <input class="filter" type="text" name="filters.value.[% field | html %]" value="[% filters.$field.value | html %]" size="[% filters.$field.size %]" />
+        [%- END %]
       [%- END %]
     </td>
   [% END %]

@@ -9,6 +9,9 @@ body {
   margin: 30px 60px;
 }
 
+
+/* Summary page */
+
 table.tablesorter thead tr .header {
   background-image: url(../../../images/themes/forest/bg.gif);
 }
@@ -25,6 +28,10 @@ table.tablesorter thead tr th,
 table.tablesorter tfoot tr th {
   background-color: #0f390f;
   color: #ccc;
+}
+
+table.tablesorter thead input[type="text"].filter {
+  border: 1px solid #444;
 }
 
 table.tablesorter tbody td {
