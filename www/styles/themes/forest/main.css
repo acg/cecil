@@ -67,6 +67,38 @@ table.tablesorter .field-Updated {
   text-align: center;
 }
 
+.percentage {
+  position: relative;
+  display: inline-block;
+  margin-right: 8px;
+  width: 60px;
+  height: 18px;
+  background-color: #aaa;
+  overflow: hidden;
+}
+
+.percentage .text {
+  position: absolute;
+  left: 4px;
+  top: 2px;
+  height: 10;
+  color: #dfd;
+  font-size: 12px;
+}
+
+.percentage .pos {
+  display: inline-block;
+  background-color: #88f;
+}
+
+.percentage.over .pos {
+  background-color: #c93;
+}
+
+.percentage.unknown .text {
+  /* display: none; */
+}
+
 
 /* Individual issue page. */
 
