@@ -1,6 +1,22 @@
 ;(function($) {
 
 
+$(document).ready( function() {
+
+  $('table').tablesorter();
+
+  $('.filter').change( function() {
+    var form = $('form.mainform');
+    /* Remove empty fields to avoid cluttering the query string */
+    form.find('.filter:input[value=""]').attr('disabled',true);
+    form.submit();
+  } );
+
+  $('.field-Progress').percentageBar();
+
+} );
+
+
 $.fn.percentageBar = function() {
   $(this).each( function(i,elem) {
 
@@ -29,7 +45,15 @@ $.fn.percentageBar = function() {
     }
 
     var bar = $('<div class="percentage"><div class="text">'+percent+' %</div><div class="pos">&nbsp;</div></div>');
-    $('.pos', bar).css({ width: percent+'%', 'background-color': '#'+color });
+    var pos = $('.pos', bar);
+    var issue = $(elem).parent('tr');
+
+    pos.css({ width: percent+'%' });
+
+    // HACK overlay a gray alpha mask instead
+    if (!issue.hasClass('Status-Finished') && !issue.hasClass('Status-Aborted'))
+      pos.css({ 'background-color': '#'+color });
+
     if (percent > 100) $(bar).addClass("over");
     if (y == 0) $(bar).addClass("unknown");
     $(elem).prepend(bar);
@@ -37,20 +61,5 @@ $.fn.percentageBar = function() {
   } );
 };
 
-
-$(document).ready( function() {
-
-  $('table').tablesorter();
-
-  $('.filter').change( function() {
-    var form = $('form.mainform');
-    /* Remove empty fields to avoid cluttering the query string */
-    form.find('.filter:input[value=""]').attr('disabled',true);
-    form.submit();
-  } );
-
-  $('.field-Progress').percentageBar();
-
-} );
 
 })(jQuery);

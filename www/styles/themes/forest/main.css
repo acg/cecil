@@ -99,7 +99,8 @@ table.tablesorter .field-Updated {
   /* display: none; */
 }
 
-tr.Status-Finished .percentage .pos {
+tr.Status-Finished .percentage .pos,
+tr.Status-Aborted .percentage .pos {
   background-color: #888;
 }
 
