@@ -6,6 +6,7 @@ use URI::QueryParam;
 use HTTP::Response;
 use HTTP::Date qw/ str2time /;
 use POSIX qw/ strftime /;
+use TopoSort qw/ tsort /;
 use open ':encoding(utf8)';
 use open ':std';
 use warnings;
@@ -134,12 +135,25 @@ sub summary_page_data
   my @timelogs = map @$_ => map load_timesheet( $_ ) => @timesheet_files;
 
 
-  ### Load issues and build the list of issues to show in the ui.
+  ### Load the issues.
 
   my @issue_files = glob( "$issues_dir/i_*.cil" );
   my @issues = map load_issue( $_, headers => 1 ) => @issue_files;
-  my @issues_ui;
 
+  ### Topologically sort the issues in the Parent relationship graph.
+  ### This is done so Worked / Estimated can be summed into the Parent.
+
+  my %issue_indices = do { my $i=0; map { ("$_->{Id}", $i++) } @issues };
+  my @issue_deps = map { [ $issue_indices{$_->{Parent}||''} || () ] } @issues;
+  my @issue_tsort = tsort( @issue_deps );
+
+  @issues = map $issues[$_] => @issue_tsort;
+  %issue_indices = do { my $i=0; map { ("$_->{Id}", $i++) } @issues };
+
+
+  ### Build the list of issues to show in the ui.
+
+  my @issues_ui;
 
   for my $issue (@issues)
   {
@@ -149,12 +163,15 @@ sub summary_page_data
     $issue->{Owner} ||= "Nobody";
     $issue->{Owner} =~ s/\s*<\S+\@\S+>\s*$//;
 
-    my $worked = 0;
+    if (!defined $issue->{Worked})
+    {
+      $issue->{Worked} = 0.0;
+      $issue->{Worked} += ($_->{time1} - $_->{time0}) for
+        grep $_->{issue} eq $issue->{Id} => @timelogs;
+      $issue->{Worked} /= 3600;
+    }
 
-    $worked += ($_->{time1} - $_->{time0}) for
-      grep $_->{issue} eq $issue->{Id} => @timelogs;
-
-    $issue->{Worked} = sprintf "%.1f" => ($worked/3600);
+    $issue->{Worked} = sprintf "%.1f" => $issue->{Worked};
     $issue->{Estimated} ||= 0.0;
     $issue->{Progress} = "$issue->{Worked} / $issue->{Estimated}";
     $issue->{Updated} = strftime( '%D %R' =>
@@ -164,6 +181,17 @@ sub summary_page_data
       $issue->{DueDate} = strftime( '%D %R' =>
         localtime parse_timezstamp( $date ) );
     }
+
+    ### Accrue Worked / Estimated to Parent issue, if there is one.
+
+    if (defined( my $parent = $issue_indices{$issue->{Parent}||''} )) {
+      $parent = $issues[ $parent ];
+      $parent->{Worked} ||= 0.0;
+      $parent->{Worked} += $issue->{Worked};
+      $parent->{Estimated} ||= 0.0;
+      $parent->{Estimated} += $issue->{Estimated};
+    }
+
 
     ### Apply any filters. See if this issue should be skipped.
 
