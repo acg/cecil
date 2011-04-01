@@ -11,7 +11,7 @@ my %config =
 (
   %Cecil::DEFAULT_CONFIG,
   prefix => "$FindBin::RealBin/..",
-  issues_dir => "$FindBin::RealBin/../issues",
+  issues_dir => $ENV{CIL_ISSUES} || "$FindBin::RealBin/../issues",
   theme => 'forest',
 );
 
