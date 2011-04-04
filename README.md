@@ -10,13 +10,13 @@ Here's the main summary page, showing several features in action:
 
 * Search: show only issues matching the text "cil"
 * Filtering: show only issues assigned to me, "Alan Grow"
-* Sorting: sort by Status, then by Summary text (quick client-side sort)
+* Sorting: sort by Status, then by Summary text (this is a quick client-side sort)
 
-![The cecil issue summary page](./cecil/raw/master/doc/cecil-summary.png)
+![The cecil issue summary page](./raw/master/doc/cecil-summary.png)
 
 ### Issue Details ###
 
-![The cecil issue details page](./cecil/raw/master/doc/cecil-issue.png)
+![The cecil issue details page](./raw/master/doc/cecil-issue.png)
 
 ## Installation ##
 
