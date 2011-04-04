@@ -51,7 +51,7 @@ In the cecil directory:
 
     make
 
-Now open issues/summary.html in your browser. Note that some things like filtering will not work in the static interface.
+Now open www/summary.html in your browser. Note that some things like filtering will not work in the static interface.
 
 ## Theming ##
 
