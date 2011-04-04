@@ -212,11 +212,19 @@ sub summary_page_data
 
     while (my ($key, $value) = each %$issue)
     {
-      if ($key eq 'Id' || $key eq 'Parent' || $key eq 'Summary')
+      if ($key eq 'Id' || $key eq 'Summary')
       {
         $issue_ui->{$key} = {
           type => 'Link',
           url => "i_$issue->{Id}.html",
+          text => $value,
+        };
+      }
+      elsif ($key eq 'Parent')
+      {
+        $issue_ui->{$key} = {
+          type => 'Link',
+          url => "i_$issue->{Parent}.html",
           text => $value,
         };
       }
