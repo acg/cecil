@@ -13,7 +13,7 @@
 <thead>
   <tr>
   [% FOREACH field IN summary_fields %]
-    <td>
+    <td class="filter-[% field | html %]">
       [%- IF filters.$field %]
         [%- IF filters.$field.type == 'select' %]
       <select class="filter" name="filters.value.[% field | html %]">

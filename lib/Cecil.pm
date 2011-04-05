@@ -103,6 +103,11 @@ sub summary_page_data
 
   my %filter_configs =
   (
+    Parent => {
+      type => 'select',
+      matches => sub { $_[1] eq $_[0] },
+      options => [ { value => '', text => '-' } ],
+    },
     Status => {
       type => 'select',
       matches => sub { $_[1] eq $_[0] },
@@ -147,7 +152,7 @@ sub summary_page_data
   my @issue_deps = map { [ $issue_indices{$_->{Parent}||''} || () ] } @issues;
   my @issue_tsort = tsort( @issue_deps );
 
-  die "Cyclic parent dependencies" if @issues != @issue_tsort;
+  die "cyclic parent dependencies" if @issues != @issue_tsort;
   @issues = map $issues[$_] => @issue_tsort;
   %issue_indices = do { my $i=0; map { ("$_->{Id}", $i++) } @issues };
 
@@ -198,12 +203,14 @@ sub summary_page_data
 
     my $skip_issue = 0;
 
-    while (my ($key, $value) = each %$issue)
+    while (my ($key, $filter) = each %filters)
     {
-      my $filter = $filters{$key} or next;
       my $filter_value = $filter->{value} or next;
+      my $value = defined $issue->{$key} ? $issue->{$key} : "";
       $skip_issue ||= !$filter->{matches}($filter_value, $value);
     }
+
+    warn "skip issue $issue->{Id} parent $issue->{Parent} = $skip_issue\n";
 
 
     ### Build typed data fields for presentation layer.
