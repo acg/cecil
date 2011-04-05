@@ -18,11 +18,7 @@
         [%- IF filters.$field.type == 'select' %]
       <select class="filter" name="filters.value.[% field | html %]">
           [%- FOREACH option IN filters.$field.options %]
-            [%- IF option.active %]
-        <option value="[% option.value | html %]" selected="true">
-            [%- ELSE %]
-        <option value="[% option.value | html %]">
-            [%- END %]
+        <option value="[% option.value | html %]" title="[% option.title | html %]"[% ' selected="true"' IF option.active %]>
           [% option.text | html %]
         </option>
           [%- END %]
@@ -42,7 +38,7 @@
     [%- IF issue.$field.type == 'String' %]
     <td class="field-[% field %]">[% issue.$field.text | html %]</td>
     [%- ELSIF issue.$field.type == 'Link' %]
-    <td class="field-[% field %]"><a href="[% issue.$field.url %]">[% issue.$field.text | html %]</a></td>
+    <td class="field-[% field %]"><a href="[% issue.$field.url %]" title="[% issue.$field.title | html %]">[% issue.$field.text | html %]</a></td>
     [%- END %]
   [%- END %]
   </tr>

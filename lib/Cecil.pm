@@ -154,7 +154,8 @@ sub summary_page_data
 
   die "cyclic parent dependencies" if @issues != @issue_tsort;
   @issues = map $issues[$_] => @issue_tsort;
-  %issue_indices = do { my $i=0; map { ("$_->{Id}", $i++) } @issues };
+
+  my %issues = map { ($_->{Id}, $_) } @issues;
 
 
   ### Build the list of issues to show in the ui.
@@ -190,8 +191,9 @@ sub summary_page_data
 
     ### Accrue Worked / Estimated to Parent issue, if there is one.
 
-    if (defined( my $parent = $issue_indices{$issue->{Parent}||''} )) {
-      $parent = $issues[ $parent ];
+    my $parent = $issues{$issue->{Parent}||''};
+
+    if ($parent) {
       $parent->{Worked} ||= 0.0;
       $parent->{Worked} += $issue->{Worked};
       $parent->{Estimated} ||= 0.0;
@@ -225,14 +227,16 @@ sub summary_page_data
           type => 'Link',
           url => "i_$issue->{Id}.html",
           text => $value,
+          title => $issue->{Summary},
         };
       }
       elsif ($key eq 'Parent')
       {
         $issue_ui->{$key} = {
           type => 'Link',
-          url => "i_$issue->{Parent}.html",
+          url => $parent ? "i_$issue->{Parent}.html" : "#",
           text => $value,
+          title => $parent ? $parent->{Summary} : "",
         };
       }
       else
@@ -254,6 +258,7 @@ sub summary_page_data
             value => $value,
             text => $value,
             active => $filter->{matches}( $filter->{value}, $value ),
+            title => $issue_ui->{$key}->{title} || "",
           };
         }
       }
