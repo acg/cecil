@@ -212,8 +212,6 @@ sub summary_page_data
       $skip_issue ||= !$filter->{matches}($filter_value, $value);
     }
 
-    warn "skip issue $issue->{Id} parent $issue->{Parent} = $skip_issue\n";
-
 
     ### Build typed data fields for presentation layer.
 
@@ -227,7 +225,7 @@ sub summary_page_data
           type => 'Link',
           url => "i_$issue->{Id}.html",
           text => $value,
-          title => $issue->{Summary},
+          title => ($key eq 'Id' ? $issue->{Summary} : ''),
         };
       }
       elsif ($key eq 'Parent')
