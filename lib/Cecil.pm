@@ -4,9 +4,8 @@ use Template;  # Template::Toolkit
 use URI;
 use URI::QueryParam;
 use HTTP::Response;
-use HTTP::Date qw/ str2time /;
-use POSIX qw/ strftime /;
 use TopoSort qw/ tsort /;
+use TimeUtil qw/ timeparts timetrunc friendly_time parse_timezstamp /;
 use open ':encoding(utf8)';
 use open ':std';
 use warnings;
@@ -181,13 +180,6 @@ sub summary_page_data
     $issue->{Worked} = sprintf "%.1f" => $issue->{Worked};
     $issue->{Estimated} ||= 0.0;
     $issue->{Progress} = "$issue->{Worked} / $issue->{Estimated}";
-    $issue->{Updated} = strftime( '%D %R' =>
-      localtime parse_timezstamp( $issue->{Updated} ) );
-
-    if (my $date = $issue->{DueDate}) {
-      $issue->{DueDate} = strftime( '%D %R' =>
-        localtime parse_timezstamp( $date ) );
-    }
 
     ### Accrue Worked / Estimated to Parent issue, if there is one.
 
@@ -235,6 +227,17 @@ sub summary_page_data
           url => $parent ? "i_$issue->{Parent}.html" : "#",
           text => $value,
           title => $parent ? $parent->{Summary} : "",
+        };
+      }
+      elsif (($key eq 'DueDate' || $key eq 'Updated') && $value ne '')
+      {
+        my $utc = parse_timezstamp( $value );
+        my $friendly = friendly_time( $utc );
+
+        $issue_ui->{$key} = {
+          type => 'Date',
+          text => $friendly,
+          value => $utc,
         };
       }
       else
@@ -416,13 +419,6 @@ sub load_timesheet
   return \@records;
 }
 
-
-sub parse_timezstamp
-{
-  my $timestamp = shift;
-  my $zone = ($timestamp =~ s/\s*Z?([+-]?\d\d\d\d)$// and $1 or undef);
-  return str2time( $timestamp, $zone );
-}
 
 1;
 

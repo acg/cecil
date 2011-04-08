@@ -3,7 +3,16 @@
 
 $(document).ready( function() {
 
-  $('table').tablesorter();
+  $('table').tablesorter({
+    textExtraction: function(elem) {
+      if ($(elem).hasClass('field-Id') || $(elem).hasClass('field-Parent'))
+        return $('a',elem).text();
+      else if ($(elem).hasClass('field-Updated'))
+        return $('em',elem).text();
+      else
+        return $(elem).text();
+    }
+  });
 
   $('.filter').change( function() {
     var form = $('form.mainform');
@@ -20,7 +29,7 @@ $(document).ready( function() {
 $.fn.percentageBar = function() {
   $(this).each( function(i,elem) {
 
-    var parts = $(elem).text().split(' ');
+    var parts = $(elem).text().trim().split(' ');
     var x = parseFloat(parts[0]);
     var y = parseFloat(parts[2]);
 

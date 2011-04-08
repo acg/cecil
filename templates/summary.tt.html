@@ -35,11 +35,15 @@
 [% FOREACH issue IN issues %]
   <tr class="Status-[% issue.Status.text | html %]">
   [%- FOREACH field IN summary_fields %]
-    [%- IF issue.$field.type == 'String' %]
-    <td class="field-[% field %]">[% issue.$field.text | html %]</td>
-    [%- ELSIF issue.$field.type == 'Link' %]
-    <td class="field-[% field %]"><a href="[% issue.$field.url %]" title="[% issue.$field.title | html %]">[% issue.$field.text | html %]</a></td>
-    [%- END %]
+    <td class="field-[% field %]">
+    [%- IF issue.$field.type == 'String' -%]
+      [% issue.$field.text | html %]
+    [%- ELSIF issue.$field.type == 'Link' -%]
+      <a href="[% issue.$field.url %]" title="[% issue.$field.title | html %]">[% issue.$field.text | html %]</a>
+    [%- ELSIF issue.$field.type == 'Date' -%]
+      <em>[% issue.$field.value | html %]</em><span>[% issue.$field.text | html %]</span>
+    [%- END -%]
+    </td>
   [%- END %]
   </tr>
 [% END %]
