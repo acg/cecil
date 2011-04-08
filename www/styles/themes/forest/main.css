@@ -86,6 +86,10 @@ table.tablesorter .field-Updated em {
   display: none;
 }
 
+table.tablesorter .field-Summary {
+  padding-left: 8px;
+}
+
 .percentage {
   position: relative;
   display: inline-block;
