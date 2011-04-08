@@ -54,16 +54,20 @@ sub friendly_time
     $fmt = "Today %l:%M%P";
   }
   elsif ($now - $time >= 3600) {
-    $fmt = sprintf "%d hours ago" => int(($now - $time)/3600);
+    my $hours = int(($now - $time)/3600);
+    $fmt = sprintf "%d hour%s ago" => $hours, ($hours==1) ? '' : 's';
   }
-  elsif ($time - $now <= 3600) {
-    $fmt = sprintf "in %d hours" => int(($time - $now)/3600);
+  elsif ($now - $time <= -3600) {
+    my $hours = int(($now - $time)/3600);
+    $fmt = sprintf "in %d hour%s" => $hours, ($hours==1) ? '' : 's';
   }
-  elsif ($now - $time <= 60) {
-    $fmt = sprintf "%d minutes ago" => int(($now - $time)/60);
+  elsif ($now - $time >= 60) {
+    my $minutes = int(($now - $time)/60);
+    $fmt = sprintf "%d minute%s ago" => $minutes, ($minutes==1) ? '' : 's';
   }
-  elsif ($time - $now >= 60) {
-    $fmt = sprintf "%d minutes ago" => int(($time - $now)/60);
+  elsif ($now - $time <= -60) {
+    my $minutes = int(($now - $time)/60);
+    $fmt = sprintf "in %d minute%s" => $minutes, ($minutes==1) ? '' : 's';
   }
   else {
     $fmt = "just now";
