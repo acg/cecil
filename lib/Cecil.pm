@@ -19,6 +19,14 @@ our %DEFAULT_CONFIG =
   theme => 'steelblue',
 );
 
+# FIXME this should be determined by reading .cil
+our %OPEN_STATUSES =
+(
+  New => 1,
+  Open => 1,
+  InProgress => 1,
+);
+
 
 sub new
 {
@@ -59,7 +67,7 @@ sub handle
 }
 
 
-### FIXME There methods beyond this point, just free functions. Refactor.
+### FIXME No methods beyond this point, just free functions. Refactor.
 
 
 sub render_html
@@ -189,7 +197,8 @@ sub summary_page_data
       $parent->{Worked} ||= 0.0;
       $parent->{Worked} += $issue->{Worked};
       $parent->{Estimated} ||= 0.0;
-      $parent->{Estimated} += $issue->{Estimated};
+      $parent->{Estimated} += $OPEN_STATUSES{$issue->{Status}} ?
+        $issue->{Estimated} : $issue->{Worked};
     }
 
 
