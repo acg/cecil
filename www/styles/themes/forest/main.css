@@ -79,6 +79,13 @@ table.tablesorter .filter-Parent select {
   font-family: monospace;
 }
 
+table.tablesorter .filter-Id select {
+  width: 80%;
+}
+table.tablesorter .filter-Id {
+  padding-left: 6px;
+}
+
 table.tablesorter .field-DueDate,
 table.tablesorter .field-Updated {
   text-align: right;

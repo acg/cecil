@@ -109,13 +109,10 @@ sub summary_page_data
 
   my %filter_configs =
   (
-    Parent => {
+    Id => {
       type => 'select',
-      matches => sub {
-        ($_[1]->{Parent}||'') eq $_[0]->{value} ||
-        ($_[1]->{Id}||'')     eq $_[0]->{value}
-      },
-      options => [ { value => '', text => '-' } ],
+      matches => sub { $_[1]->{TreePath} =~ m#(^|/)\Q$_[0]->{value}\E($|/)# },
+      options => [ { value => '', text => '- Root -' } ],
     },
     Status => {
       type => 'select',
@@ -282,10 +279,15 @@ sub summary_page_data
       {
         if ($filter->{type} eq 'select')
         {
+          ### The Id filter actually filters by Parent (ancestor).
+
+          my $filter_value = $value;
+          $filter_value = ($issue->{Parent}||'') if $key eq 'Id';
+
           push @{$filter->{options}}, {
-            value => $value,
-            text => $value,
-            active => $filter->{matches}( $filter, $issue, $key ),
+            value => $filter_value,
+            text => $filter_value,
+            active => 0+$filter->{matches}( $filter, $issue, $key ),
             title => $issue_ui->{$key}->{title} || "",
           };
         }
