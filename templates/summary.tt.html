@@ -36,11 +36,12 @@
   <tr class="Status-[% issue.Status.text | html %]">
   [%- FOREACH field IN summary_fields %]
     <td class="field-[% field %]">
+    [%- IF field == 'Id' -%]
+      <b>[%- FILTER repeat(issue.Depth.value) -%]..[%- END -%]</b>
+    [%- END -%]
     [%- IF issue.$field.type == 'String' -%]
       [% issue.$field.text | html %]
-    [%- ELSIF issue.$field.type == 'Link' -%]
-      <a href="[% issue.$field.url %]" title="[% issue.$field.title | html %]">[% issue.$field.text | html %]</a>
-    [%- ELSIF issue.$field.type == 'Date' -%]
+    [%- ELSIF issue.$field.type == 'Link' -%]<a href="[% issue.$field.url %]" title="[% issue.$field.title | html %]">[% issue.$field.text | html %]</a>[%- ELSIF issue.$field.type == 'Date' -%]
       <em>[% issue.$field.value | html %]</em><span>[% issue.$field.text | html %]</span>
     [%- END -%]
     </td>

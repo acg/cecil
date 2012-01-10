@@ -58,9 +58,17 @@ table.tablesorter tbody a:hover {
 
 table.tablesorter .field-Id,
 table.tablesorter .field-Parent {
-  text-align: center;
   padding-left: 6px;
   padding-right: 6px;
+  text-align: center;
+}
+
+table.tablesorter .field-Id {
+  text-align: left;
+}
+
+table.tablesorter .field-Id b {
+  margin-left: 6px;
 }
 
 table.tablesorter .field-Id,
@@ -185,4 +193,5 @@ tr.Status-Aborted .percentage .mask {
 .section-issue .issue .description p {
   padding-bottom: 10px;
 }
+
 

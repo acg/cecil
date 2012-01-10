@@ -56,3 +56,6 @@ table.tablesorter thead tr .headerSortDown {
   padding-bottom: 10px;
 }
 
+.field-Id {
+  text-align: right;
+}

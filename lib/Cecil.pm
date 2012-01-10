@@ -14,7 +14,7 @@ use strict;
 
 our %DEFAULT_CONFIG =
 (
-  summary_fields => [ qw(Id Parent Status Owner Progress DueDate Updated Summary) ],
+  summary_fields => [ qw(Id Status Owner Progress DueDate Updated Summary) ],
   issue_fields => [ qw(Id Parent Summary Status AssignedTo CreatedBy Inserted Updated) ],
   theme => 'steelblue',
 );
@@ -103,8 +103,7 @@ sub summary_page_data
 {
   my $config = shift;
   my $issues_dir = shift;
-  my $param = shift || {};
-
+  my %param = %{ shift || {} };
 
   ### Set up the per-field filters.
 
@@ -140,7 +139,7 @@ sub summary_page_data
   while (my ($field, $filter_config) = each %filter_configs)
   {
     my $filter = $filters{$field} = { %$filter_config };
-    $filter->{value} = $param->{"filters.value.$field"}||'';
+    $filter->{value} = $param{"filters.value.$field"}||'';
   }    
 
 
@@ -156,23 +155,40 @@ sub summary_page_data
   my @issues = map load_issue( $_, headers => 1 ) => @issue_files;
 
   ### Topologically sort the issues in the Parent relationship graph.
-  ### This is done so Worked / Estimated can be summed into the Parent.
+  ### This is done so iteration can proceed from child-to-parent
+  ### or parent-to-child.
 
   my %issue_indices = do { my $i=0; map { ("$_->{Id}", $i++) } @issues };
   my @issue_deps = map { [ $issue_indices{$_->{Parent}||''} || () ] } @issues;
   my @issue_tsort = tsort( @issue_deps );
-
   die "cyclic parent dependencies" if @issues != @issue_tsort;
   @issues = map $issues[$_] => @issue_tsort;
 
   my %issues = map { ($_->{Id}, $_) } @issues;
 
 
+  ### Assign depth and path for tree view.
+  ### Iterate in child-to-parent order.
+
+  for my $issue (reverse @issues)
+  {
+    my $parent = $issues{$issue->{Parent}||''};
+    $issue->{Depth} = $parent ? $parent->{Depth}+1 : 0;
+    $issue->{TreePath} = $parent ? $parent->{TreePath}.'/'.$issue->{Id} : $issue->{Id};
+  }
+
+  ### Sort the issues. By default, sort by path in the tree.
+
+  @issues = sort { $a->{TreePath} cmp $b->{TreePath} } @issues;
+
+
   ### Build the list of issues to show in the ui.
+  ### Go in child to parent order so Estimated and Worked can
+  ### be accumulated in the parent issue.
 
   my @issues_ui;
 
-  for my $issue (@issues)
+  for my $issue (reverse @issues)
   {
     ### Calculate derived fields; do formatting.
 
@@ -287,7 +303,7 @@ sub summary_page_data
       };
     }
 
-    push @issues_ui, $issue_ui unless $skip_issue;
+    unshift @issues_ui, $issue_ui unless $skip_issue;
   }
 
 
