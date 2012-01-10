@@ -112,22 +112,25 @@ sub summary_page_data
   (
     Parent => {
       type => 'select',
-      matches => sub { $_[1] eq $_[0] },
+      matches => sub {
+        ($_[1]->{Parent}||'') eq $_[0]->{value} ||
+        ($_[1]->{Id}||'')     eq $_[0]->{value}
+      },
       options => [ { value => '', text => '-' } ],
     },
     Status => {
       type => 'select',
-      matches => sub { $_[1] eq $_[0] },
+      matches => sub { $_[1]->{$_[2]} eq $_[0]->{value} },
       options => [ { value => '', text => '-' } ],
     },
     Owner => {
       type => 'select',
-      matches => sub { $_[1] eq $_[0] },
+      matches => sub { $_[1]->{$_[2]} eq $_[0]->{value} },
       options => [ { value => '', text => '-' } ],
     },
     Summary => {
       type => 'text',
-      matches => sub { $_[1] =~ /\Q$_[0]\E/ },
+      matches => sub { $_[1]->{$_[2]} =~ /\Q$_[0]->{value}\E/ },
       size => '40',
     },
   );
@@ -208,9 +211,8 @@ sub summary_page_data
 
     while (my ($key, $filter) = each %filters)
     {
-      my $filter_value = $filter->{value} or next;
-      my $value = defined $issue->{$key} ? $issue->{$key} : "";
-      $skip_issue ||= !$filter->{matches}($filter_value, $value);
+      $filter->{value} or next;
+      $skip_issue ||= !$filter->{matches}( $filter, $issue, $key );
     }
 
 
@@ -267,7 +269,7 @@ sub summary_page_data
           push @{$filter->{options}}, {
             value => $value,
             text => $value,
-            active => $filter->{matches}( $filter->{value}, $value ),
+            active => $filter->{matches}( $filter, $issue, $key ),
             title => $issue_ui->{$key}->{title} || "",
           };
         }
