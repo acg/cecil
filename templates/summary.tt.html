@@ -37,7 +37,7 @@
   [%- FOREACH field IN summary_fields %]
     <td class="field-[% field %]">
     [%- IF field == 'Id' -%]
-      <b>[%- FILTER repeat(issue.Depth.value) -%]..[%- END -%]</b>
+      <b>[%- FILTER repeat(issue.Depth.value) -%]&nbsp;&nbsp;[%- END -%]</b>
     [%- END -%]
     [%- IF issue.$field.type == 'String' -%]
       [% issue.$field.text | html %]
